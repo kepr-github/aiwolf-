@@ -22,6 +22,23 @@ from aiwolf import AbstractPlayer, TcpipClient
 
 from sample import SamplePlayer
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.setLevel(logging.DEBUG)
+
+handler = logging.FileHandler('./test.log')
+
+handler.setLevel(logging.DEBUG)
+
+
+formatter = logging.Formatter('%(levelname)s  %(asctime)s  [%(name)s] %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+
+
 if __name__ == "__main__":
     agent: AbstractPlayer = SamplePlayer()
     parser: ArgumentParser = ArgumentParser(add_help=False)
@@ -30,4 +47,6 @@ if __name__ == "__main__":
     parser.add_argument("-r", type=str, action="store", dest="role", default="none")
     parser.add_argument("-n", type=str, action="store", dest="name")
     input_args = parser.parse_args()
+    print(input_args)
+    logger.debug('startpy')
     TcpipClient(agent, input_args.name, input_args.hostname, input_args.port, input_args.role).connect()

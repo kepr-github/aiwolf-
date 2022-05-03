@@ -25,6 +25,20 @@ from aiwolf.constant import AGENT_NONE
 
 from const import CONTENT_SKIP
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.setLevel(logging.DEBUG)
+
+handler = logging.FileHandler('./test.log')
+
+handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(levelname)s  %(asctime)s  [%(name)s] %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 
 class SampleVillager(AbstractPlayer):
     """Sample villager agent."""
@@ -48,7 +62,7 @@ class SampleVillager(AbstractPlayer):
 
     def __init__(self) -> None:
         """Initialize a new instance of SampleVillager."""
-
+        logger.debug('init')
         self.me = AGENT_NONE
         self.vote_candidate = AGENT_NONE
         self.game_info = None  # type: ignore
@@ -58,8 +72,11 @@ class SampleVillager(AbstractPlayer):
         self.talk_list_head = 0
 
     def is_alive(self, agent: Agent) -> bool:
+        logger.debug('isalive')
+        logger.debug(agent)
+        logger.debug(self.game_info.status_map[agent])
         """Return whether the agent is alive.
-
+        
         Args:
             agent: The agent.
 
@@ -69,6 +86,10 @@ class SampleVillager(AbstractPlayer):
         return self.game_info.status_map[agent] == Status.ALIVE
 
     def get_others(self, agent_list: List[Agent]) -> List[Agent]:
+        logger.debug('get_others')
+        logger.debug(agent_list)
+        #logger.debug(self.game_info.status_map[agent])
+
         """Return a list of agents excluding myself from the given list of agents.
 
         Args:
@@ -129,9 +150,13 @@ class SampleVillager(AbstractPlayer):
 
     def update(self, game_info: GameInfo) -> None:
         self.game_info = game_info  # Update game information.
+        logger.debug('update')
+        logger.debug(self.game_info)
         for i in range(self.talk_list_head, len(game_info.talk_list)):  # Analyze talks that have not been analyzed yet.
             tk: Talk = game_info.talk_list[i]  # The talk to be analyzed.
             talker: Agent = tk.agent
+            logger.debug(tk.text)
+            logger.debug(tk.agent)
             if talker == self.me:  # Skip my talk.
                 continue
             content: Content = Content.compile(tk.text)
@@ -142,6 +167,7 @@ class SampleVillager(AbstractPlayer):
             elif content.topic == Topic.IDENTIFIED:
                 self.identification_reports.append(Judge(talker, game_info.day, content.target, content.result))
         self.talk_list_head = len(game_info.talk_list)  # All done.
+        logger.debug(self.talk_list_head)
 
     def talk(self) -> Content:
         # Choose an agent to be voted for while talking.
@@ -167,6 +193,7 @@ class SampleVillager(AbstractPlayer):
         return CONTENT_SKIP
 
     def vote(self) -> Agent:
+        #logger.debug(self.vote_candidate)
         return self.vote_candidate if self.vote_candidate != AGENT_NONE else self.me
 
     def attack(self) -> Agent:

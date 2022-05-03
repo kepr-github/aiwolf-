@@ -23,6 +23,20 @@ from possessed import SamplePossessed
 from seer import SampleSeer
 from villager import SampleVillager
 from werewolf import SampleWerewolf
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.setLevel(logging.DEBUG)
+
+handler = logging.FileHandler('./test.log')
+
+handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(levelname)s  %(asctime)s  [%(name)s] %(message)s')
+handler.setFormatter(formatter)
+
+logger.addHandler(handler)
 
 
 class SamplePlayer(AbstractPlayer):
@@ -36,6 +50,7 @@ class SamplePlayer(AbstractPlayer):
     player: AbstractPlayer
 
     def __init__(self) -> None:
+        logger.debug('samplepy')
         self.villager = SampleVillager()
         self.bodyguard = SampleBodyguard()
         self.medium = SampleMedium()
@@ -43,6 +58,7 @@ class SamplePlayer(AbstractPlayer):
         self.possessed = SamplePossessed()
         self.werewolf = SampleWerewolf()
         self.player = self.villager
+        
 
     def attack(self) -> Agent:
         return self.player.attack()
